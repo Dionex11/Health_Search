@@ -10,11 +10,11 @@ def init():
 try:
     con=sqlite3.connect(DB_PATH)
     cur=con.cursor()
-    cur.execute("DELETE FROM notes;")
     with open("init.sql", 'r') as f:
         script = f.read()
     cur.executescript(script)
     logger.info("Database schema initialized successfully.")
+    #cur.execute("DELETE FROM notes;")
     con.commit()
     con.close()
 except:
@@ -27,10 +27,17 @@ def addrec(id:str,note:str,vec):
         emb_json = json.dumps(emb_list)
         con = sqlite3.connect(DB_PATH)
         cur = con.cursor()
-        cur.execute("INSERT INTO notes (patient_id, note, embedding) VALUES (?, ?, ?)",(id, note, emb_json))
+        cur.execute("SELECT COUNT(*) FROM notes WHERE patient_id=? AND note=?", (id, note))
+        exists = cur.fetchone()[0]
+    
+        if exists:
+            logger.info(f"Note already exists for patient_id={id}. Skipping insert.")
+        else:
+            cur.execute("INSERT INTO notes (patient_id, note, embedding) VALUES (?, ?, ?)",(id, note, emb_json))
         con.commit()
-        logger.info(f"Record added for patient ID: {id}")
         con.close()
+        logger.info(f"Record added for patient ID: {id}")
+      
     except:
         logger.exception(f"Database error while adding record for {id}")
 def fetchrec():
