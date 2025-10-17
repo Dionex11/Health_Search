@@ -41,6 +41,9 @@ It uses **Sentence Transformers** to find related notes based on *meaning*, not 
 
 #### 1️⃣ Install Dependencies
 ```bash
+To start virtual env:
+  python -m venv env
+  ./env/Scripts/activate
 pip install -r requirements.txt
 
 ```
