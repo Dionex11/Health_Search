@@ -1,92 +1,166 @@
-🏥 Healthsearch API: Semantic Medical Note Retrieval
+# 🏥 HealthSearch API — Semantic Medical Note Retrieval
 
-This is a prototype API designed to demonstrate semantic search capabilities on a corpus of medical patient notes. It utilizes Sentence Transformers to convert clinical text into dense vector embeddings, enabling retrieval based on semantic meaning rather than just keyword matching.
+A **FastAPI-based semantic search engine** for medical patient notes.  
+It uses **Sentence Transformers** to find related notes based on *meaning*, not just keywords — making it ideal for clinical and healthcare search use cases.
 
-The application is built using  modular architecture in Python with FastAPI and SQLite.
+---
 
-🚀 Setup Instructions
+## ✨ Features
 
-Environment Prerequisites
+- 🔍 **Semantic Search** using Sentence Transformers  
+- 🧱 **Modular Architecture** (FastAPI + SQLite)  
+- 🔐 **API Token Authentication**  
+- 🧾 **Detailed Logging & Error Handling**  
+- ⚙️ **Lightweight & Portable**, zero setup needed  
 
-Python 3.9+
+---
 
-All project files (app.py, database.py, embed.py, util.py, model.py, logger.py, init_db.sql, test_api.sh) must be in the same directory.
+## 🧠 System Architecture
 
-Dependency Installation
+| Module | Purpose |
+|---------|----------|
+| `app.py` | Main API — routes, authentication, orchestration |
+| `model.py` | Defines Pydantic schemas for validation |
+| `database.py` | Handles SQLite storage and CRUD operations |
+| `embed.py` | Loads Sentence Transformer and vectorizes text |
+| `util.py` | Provides similarity calculation utilities |
+| `logger.py` | Centralized logging setup |
+| `init_db.sql` | Database initialization script |
 
-The project relies on standard data science and web development libraries.
+---
 
-# Install dependencies:
+## ⚙️ Setup & Installation
 
+### 🧩 Prerequisites
+- **Python 3.9+**
+- All project files (`app.py`, `database.py`, `embed.py`, `util.py`, `model.py`, `logger.py`, `init_db.sql`, `test_api.sh`) in one directory.
+
+---
+
+### 🪜 Steps
+
+#### 1️⃣ Install Dependencies
+```bash
 pip install -r requirements.txt
 
-Configuration Requirements
+```
 
-The application uses a simple API token for access control. This token is defined as a global constant in app.py.
+#### 2️⃣ Run the Application Server
+```
+uvicorn app:app --reload
 
-API Token: mysecrettoken123
-
-Header: All requests must include the header X-API-Token: mysecrettoken123.
-
-Commands to Run the Service
-
-Command to start the server directly: uvicorn app:app --reload     
-
-The server will be accessible at http://127.0.0.1:8000.
-
--How to Test the Endpoints
-
-Use the provided test.sh script to quickly populate the database and run a search query.
-
-Make the script executable:
-
-chmod +x test_api.sh
-
-
-Run the script in new terminal(Use gitbash):
-
+  ➡️ Access the API at: http://127.0.0.1:8000
+  
+  📘 Interactive Swagger Docs: http://127.0.0.1:8000/docs
+  
+  📗 ReDoc Interface: http://127.0.0.1:8000/redoc
+```
+3️⃣ Test the API (Auto Script)
+```
 ./test.sh
 
-(Note: The script handles the required X-API-Token header automatically.)
 
+This script:
+
+Inserts test data
+
+Runs a search query
+
+Automatically includes the X-API-Token header
+```
+4️⃣ Make Manual API Requests
+
+Include the authentication header in all requests:
+```
+-H "X-API-Token: mysecrettoken123"
+
+
+Example:
+
+curl -H "X-API-Token: mysecrettoken123" \
+"http://127.0.0.1:8000/search_notes?q=difficulty%20getting%20enough%20air"
+```
+🔐 Authentication
+```
+Header	Example
+X-API-Token	mysecrettoken123
+
+Defined globally in app.py for simplicity.
+Unauthorized requests return a 401 Unauthorized response.
+```
+🧱 Database Design
+```
+Backend: SQLite (lightweight and file-based)
+
+Schema: Defined in init_db.sql
+
+Each record includes:
+
+patient_id
+
+note
+
+embedding (stored as serialized vector)
+```
+🧩 API Endpoints
+Method	Endpoint	Description
+```
+POST	/add_note	Add a new patient note
+GET	/search_notes?q=...	Search existing notes semantically
+```
+
+🧾 Example Usage
+➕ Add a Note
+```
+curl -X POST "http://127.0.0.1:8000/add_note" \
+-H "Content-Type: application/json" \
+-H "X-API-Token: mysecrettoken123" \
+-d '{"patient_id": 101, "note": "Patient reports severe headache and dizziness"}'
+```
+🔍 Search Notes
+```
+curl -H "X-API-Token: mysecrettoken123" \
+"http://127.0.0.1:8000/search_notes?q=headache"
+```
 💡 Design Decisions
 
-Technology Choices and Rationale
+  🧬 Sentence Transformers
+  
+  Used to generate dense vector embeddings for clinical notes.
+  Model: all-MiniLM-L6-v2 → lightweight, fast, and semantically accurate.
+  
+  🗃️ SQLite
+  
+  Chosen for:
+  
+  Zero configuration
+  
+  Portability
+  
+  Perfect for demos and small projects
+  
+  ⚙️ Search Algorithm
+  Aspect	Current	Future
+  Search Type	Linear (O(N))	ANN-based
+  Technology	Manual cosine similarity	FAISS / Chroma / Pinecone
+  ⚖️ Trade-offs & Future Improvements
+  Area	Current Implementation	Future Plan
+  Scalability	Linear in-memory search	Vector index with FAISS/Chroma
+  Authentication	Static API Token	OAuth2 / JWT
+  Database	SQLite	PostgreSQL or managed DB
+  Deployment	Local uvicorn	Docker / Kubernetes
+  Shutdown Handling	Manual	Graceful teardown via context manager
+  🧰 Logging & Error Handling
+  
+  Uses logger.exception() for full stack traces
+  
+  Handles:
+  
+  sqlite3.DatabaseError
+  
+  Generic exceptions
+  
+  Returns structured JSON with appropriate HTTP codes
 
-Sentence Transformers
-
-Essential for converting text into semantically meaningful vectors, enabling search capabilities beyond simple keyword matching. We use all-MiniLM-L6-v2 for its excellent balance of speed and quality.
-
-SQLite
-
-Chosen for simplicity, zero-configuration setup, and ease of demonstration, making the project portable.
 
 
-
-app.py: Handles only routing, authentication, and orchestrates calls.
-
-model.py: Holds data validation schemas (Pydantic).
-
-database.py: Manages all persistent storage logic (CRUD operations, connection management).
-
-embed.py: Contains all logic related to the embedding model (loading, vectorization).
-
-util.py: Houses mathematical utilities (cosine_sim).
-
-Database Design Decisions (database.py and init_db.sql)
-
-
-Trade-offs Considered
-
-Linear Search vs. Vector Index (Scalability):
-
-Current Choice: We fetch all data from SQLite and perform a linear search (O(N)) by iterating through every note and calculating similarity.
-
-Trade-off: This is simple and requires no extra infrastructure but is not scalable. For a production application with thousands of notes, this would be replaced by a specialized vector database or library (e.g., FAISS, Chroma, Pinecone) to perform fast Approximate Nearest Neighbor (ANN) search.
-
-
-Authentication: Simple API Token verification using X-API-Token header. Robust Error Handling: Specific sqlite3.DatabaseError and general exceptions are caught and logged with stack traces (logger.exception). Input Validation: Manual check for missing patient_id or note.
-
-Known Limitations / Future Improvements
-
-1. Scalability: Must migrate search to a dedicated vector index (FAISS/Chroma). 2. Authentication: Upgrade from simple token to OAuth2 or similar framework. 3. Shutdown: Implement the lifespan context manager to ensure the DB connection is gracefully closed.
