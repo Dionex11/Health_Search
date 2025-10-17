@@ -126,41 +126,42 @@ curl -H "X-API-Token: mysecrettoken123" \
 
   🧬 Sentence Transformers
   
-  Used to generate dense vector embeddings for clinical notes.
-  Model: all-MiniLM-L6-v2 → lightweight, fast, and semantically accurate.
+    Used to generate dense vector embeddings for clinical notes.
+    Model: all-MiniLM-L6-v2 → lightweight, fast, and semantically accurate.
   
   🗃️ SQLite
   
-  Chosen for:
+    Chosen for:
+    
+    Zero configuration
+    
+    Portability
+    
+    Perfect for demos and small projects
+    
+    ⚙️ Search Algorithm
+    Aspect	Current	Future
+    Search Type	Linear (O(N))	ANN-based
+    Technology	Manual cosine similarity	FAISS / Chroma / Pinecone
+    ⚖️ Trade-offs & Future Improvements
+    Area	Current Implementation	Future Plan
+    Scalability	Linear in-memory search	Vector index with FAISS/Chroma
+    Authentication	Static API Token	OAuth2 / JWT
+    Database	SQLite	PostgreSQL or managed DB
+    Deployment	Local uvicorn	Docker / Kubernetes
+    Shutdown Handling	Manual	Graceful teardown via context manager
   
-  Zero configuration
-  
-  Portability
-  
-  Perfect for demos and small projects
-  
-  ⚙️ Search Algorithm
-  Aspect	Current	Future
-  Search Type	Linear (O(N))	ANN-based
-  Technology	Manual cosine similarity	FAISS / Chroma / Pinecone
-  ⚖️ Trade-offs & Future Improvements
-  Area	Current Implementation	Future Plan
-  Scalability	Linear in-memory search	Vector index with FAISS/Chroma
-  Authentication	Static API Token	OAuth2 / JWT
-  Database	SQLite	PostgreSQL or managed DB
-  Deployment	Local uvicorn	Docker / Kubernetes
-  Shutdown Handling	Manual	Graceful teardown via context manager
   🧰 Logging & Error Handling
   
-  Uses logger.exception() for full stack traces
-  
-  Handles:
-  
-  sqlite3.DatabaseError
-  
-  Generic exceptions
-  
-  Returns structured JSON with appropriate HTTP codes
+    Uses logger.exception() for full stack traces
+    
+    Handles:
+    
+    sqlite3.DatabaseError
+    
+    Generic exceptions
+    
+    Returns structured JSON with appropriate HTTP codes
 
 
 
